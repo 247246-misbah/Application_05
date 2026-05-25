@@ -1,0 +1,64 @@
+﻿@page "/login"
+@using Application_05.Services
+@rendermode InteractiveServer
+@inject AuthenticationStateService AuthService
+@implements IDisposable
+
+<div class="auth-container" style="max-width: 480px; margin: 50px auto;">
+    <div class="premium-card">
+        <div class="card-header-custom text-center">
+            <div class="auth-icon-wrapper mb-2">🔑</div>
+            <h4 class="fw-bold text-dark">Account Gatekeeper</h4>
+        </div>
+        
+        <div class="card-body-custom pt-2">
+            @if (AuthService.IsAuthenticated)
+            {
+                <div class="status-banner status-logged-in animate-fade">
+                    <span class="status-dot pulse-green"></span>
+                    <span class="fw-semibold">Session Active: Logged In</span>
+                </div>
+                <button class="btn-premium btn-logout" @onclick="HandleLogOut">
+                    ✕ Secure Log Out
+                </button>
+            }
+            else
+            {
+                <div class="status-banner status-logged-out animate-fade">
+                    <span class="status-dot gray-dot"></span>
+                    <span class="fw-semibold">Session Inactive: Guest Mode</span>
+                </div>
+                <button class="btn-premium btn-login" @onclick="HandleLogIn">
+                    ➔ Secure Log In
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private void HandleLogIn()
+    {
+        AuthService.LogIn();
+    }
+
+    private void HandleLogOut()
+    {
+        AuthService.LogOut();
+    }
+
+    protected override void OnInitialized()
+    {
+        AuthService.OnChange += InvokeStateHasChanged;
+    }
+
+    private void InvokeStateHasChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= InvokeStateHasChanged;
+    }
+}

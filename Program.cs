@@ -1,26 +1,29 @@
 using Application_05.Components;
+using Application_05.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 1. REGISTER CORE INTERACTIVE SERVICES
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Register State Management Service as a Singleton
+builder.Services.AddSingleton<AuthenticationStateService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 2. CONFIGURE PIPELINE
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.MapStaticAssets();
+// Modern Blazor Web App Routing (No _Host fallback crash!)
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

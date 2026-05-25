@@ -1,0 +1,53 @@
+﻿@page "/user-profile"
+@using Application_05.Services
+@rendermode InteractiveServer
+@inject AuthenticationStateService AuthService
+@implements IDisposable
+
+<div class="auth-container" style="max-width: 600px; margin: 40px auto;">
+    <div class="premium-card">
+        
+        <div class="card-body-custom">
+            @if (AuthService.IsAuthenticated)
+            {
+                <div class="profile-unlocked animate-fade">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="user-avatar">U</div>
+                        <div>
+                            <h5 class="mb-0 text-success fw-bold">Welcome Back,  User!</h5>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-light rounded-3 border">
+                        <h6>🔒 Secure Token Verified</h6>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="profile-locked text-center animate-fade">
+                    <div class="text-warning mb-3" style="font-size: 3rem;">⚠️</div>
+                    <h5 class="text-secondary fw-bold">Access Restrained</h5>
+                    
+                    <a href="/login" class="btn btn-primary btn-sm px-4" style="border-radius: 8px;">Go to Login</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AuthService.OnChange += InvokeStateHasChanged;
+    }
+
+    private void InvokeStateHasChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= InvokeStateHasChanged;
+    }
+}
